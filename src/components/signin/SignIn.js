@@ -11,7 +11,7 @@ import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getTheme from '../theme/getTheme';
-import TemplateFrame from './TemplateFrame';
+import TemplateFrame from '../theme/TemplateFrame';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import { axiosClient } from '../../utils/api.utils';
@@ -68,18 +68,6 @@ export default function SignIn() {
   }
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    const savedMode = localStorage.getItem('themeMode');
-    if (savedMode) {
-      setMode(savedMode);
-    } else {
-      const systemPrefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)'
-      ).matches;
-      setMode(systemPrefersDark ? 'dark' : 'light');
-    }
-  }, []);
-
   const toggleColorMode = () => {
     const newMode = mode === 'dark' ? 'light' : 'dark';
     setMode(newMode);
@@ -117,10 +105,11 @@ export default function SignIn() {
         const response = await axiosClient.post('auth/login', { username: name, password })
         if (response.data.success) {
           toast('Logged in successfully!')
+          localStorage.setItem('authToken', response.data.token)
           clearFields()
-          setTimeout(() => {
-            // navigate('/tasks');  // Navigate to /login after 2 seconds
-          }, 2000)
+          navigate('/tasks');  // Navigate to /tasks after 2 seconds
+          // setTimeout(() => {
+          // }, 2000)
         }
       } catch (error) {
         console.log(error)

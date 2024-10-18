@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import TemplateFrame from './TemplateFrame';
+import TemplateFrame from '../theme/TemplateFrame';
 import getTheme from '../theme/getTheme';
 import { axiosClient } from '../../utils/api.utils'
 import { toast } from 'react-toastify';
@@ -65,17 +65,6 @@ export default function SignIn() {
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [loading, setLoading] = React.useState(false)
-  React.useEffect(() => {
-    const savedMode = localStorage.getItem('themeMode');
-    if (savedMode) {
-      setMode(savedMode);
-    } else {
-      const systemPrefersDark = window.matchMedia(
-        '(prefers-color-scheme: dark)'
-      ).matches;
-      setMode(systemPrefersDark ? 'dark' : 'light');
-    }
-  }, []);
 
   const toggleColorMode = () => {
     const newMode = mode === 'dark' ? 'light' : 'dark';

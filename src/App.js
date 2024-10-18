@@ -12,7 +12,6 @@ const App = () => {
     // Simple auth check (e.g., check for token in localStorage)
     return localStorage.getItem('authToken');
   };
-
   return (
     <>
       <Router>
@@ -23,6 +22,7 @@ const App = () => {
           <Route path="/login" element={<Login />} />
 
           {/* Protected Routes */}
+          
           <Route path="/tasks" element={isAuthenticated() ? <Tasks /> : <Navigate to="/login" />} />
           <Route path="/categories" element={isAuthenticated() ? <Categories /> : <Navigate to="/login" />} />
 

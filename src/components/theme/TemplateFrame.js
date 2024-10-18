@@ -7,7 +7,7 @@ import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ToggleColorMode from './ToggleColorMode';
-import getTheme from '../theme/getTheme';
+import getTheme from './getTheme';
 
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: 'relative',
@@ -45,7 +45,7 @@ function TemplateFrame({
               p: '8px 12px',
             }}
           >
-            <IconButton
+            {/* <IconButton
               size="small"
               aria-label="Back to templates"
               component="a"
@@ -53,14 +53,14 @@ function TemplateFrame({
               sx={{ display: { xs: 'auto', sm: 'none' } }}
             >
               <ArrowBackRoundedIcon />
-            </IconButton>
+            </IconButton> */}
             <Box sx={{ display: 'flex', gap: 1 }}>
 
-              <ToggleColorMode
+              {/* <ToggleColorMode
                 data-screenshot="toggle-mode"
                 mode={mode}
                 toggleColorMode={toggleColorMode}
-              />
+              /> */}
             </Box>
           </Toolbar>
         </StyledAppBar>
