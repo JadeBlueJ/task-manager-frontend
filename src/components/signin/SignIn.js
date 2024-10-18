@@ -12,6 +12,9 @@ import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import getTheme from '../theme/getTheme';
 import TemplateFrame from './TemplateFrame';
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import { axiosClient } from '../../utils/api.utils';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -51,13 +54,19 @@ export default function SignIn() {
   const [mode, setMode] = React.useState('light');
   const theme = createTheme(getTheme(mode));
 
-  const [email, setEmail] = React.useState('');
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
+  const [name, setName] = React.useState('');
+  const [nameError, setNameError] = React.useState(false);
+  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
+  const [loading, setLoading] = React.useState(false)
+  const clearFields = () => {
+    setName('')
+    setPassword('')
+  }
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const savedMode = localStorage.getItem('themeMode');
@@ -79,14 +88,13 @@ export default function SignIn() {
 
   const validateInputs = () => {
     let isValid = true;
-
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
+    if (!name || name.length < 1) {
+      setNameError(true);
+      setNameErrorMessage('Name is required.');
       isValid = false;
     } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
+      setNameError(false);
+      setNameErrorMessage('');
     }
 
     if (!password || password.length < 6) {
@@ -101,13 +109,27 @@ export default function SignIn() {
     return isValid;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (validateInputs()) {
-      console.log({
-        email,
-        password,
-      });
+      try {
+        setLoading(true)
+        const response = await axiosClient.post('auth/login', { username: name, password })
+        if (response.data.success) {
+          toast('Logged in successfully!')
+          clearFields()
+          setTimeout(() => {
+            // navigate('/tasks');  // Navigate to /login after 2 seconds
+          }, 2000)
+        }
+      } catch (error) {
+        console.log(error)
+        toast.error(error)
+      }
+      finally {
+        setLoading(false)
+      }
+
     }
   };
 
@@ -130,20 +152,18 @@ export default function SignIn() {
               sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
             >
               <FormControl>
-                <FormLabel htmlFor="email">Email</FormLabel>
+                <FormLabel htmlFor="name">Full name</FormLabel>
                 <TextField
-
+                  autoComplete="name"
+                  name="name"
                   fullWidth
-                  id="email"
-                  placeholder="your@email.com"
-                  name="email"
-                  autoComplete="email"
-                  variant="outlined"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  error={emailError}
-                  helperText={emailErrorMessage}
-                  color={emailError ? 'error' : 'primary'}
+                  id="name"
+                  placeholder="Jon Snow"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  error={nameError}
+                  helperText={nameErrorMessage}
+                  color={nameError ? 'error' : 'primary'}
                 />
               </FormControl>
               <FormControl>
@@ -168,6 +188,7 @@ export default function SignIn() {
                 type="submit"
                 fullWidth
                 variant="contained"
+                disabled={loading}
               >
                 Sign In
               </Button>

@@ -12,6 +12,9 @@ import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import TemplateFrame from './TemplateFrame';
 import getTheme from '../theme/getTheme';
+import { axiosClient } from '../../utils/api.utils'
+import { toast } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -48,6 +51,9 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn() {
+  const navigate = useNavigate();
+
+
   const [mode, setMode] = React.useState('light');
   const theme = createTheme(getTheme(mode));
 
@@ -55,14 +61,10 @@ export default function SignIn() {
   const [nameError, setNameError] = React.useState(false);
   const [nameErrorMessage, setNameErrorMessage] = React.useState('');
 
-  const [email, setEmail] = React.useState('');
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-
+  const [loading, setLoading] = React.useState(false)
   React.useEffect(() => {
     const savedMode = localStorage.getItem('themeMode');
     if (savedMode) {
@@ -84,15 +86,6 @@ export default function SignIn() {
   const validateInputs = () => {
     let isValid = true;
 
-    if (!email || !/\S+@\S+\.\S+/.test(email)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
     if (!password || password.length < 6) {
       setPasswordError(true);
       setPasswordErrorMessage('Password must be at least 6 characters long.');
@@ -113,15 +106,31 @@ export default function SignIn() {
 
     return isValid;
   };
-
-  const handleSubmit = (event) => {
+  const clearFields = () => {
+    setName('')
+    setPassword('')
+  }
+  const handleSubmit = async (event) => {
     event.preventDefault();
     if (validateInputs()) {
-      console.log({
-        name,
-        email,
-        password,
-      });
+      try {
+        setLoading(true)
+        const response = await axiosClient.post('auth/signup', { username: name, password })
+        if (response.data.success) {
+          toast('Signup successful, please login')
+          clearFields()
+          setTimeout(() => {
+            navigate('/login');  // Navigate to /login after 2 seconds
+          }, 2000)
+        }
+      } catch (error) {
+        console.log(error)
+        toast.error(error)
+      }
+      finally {
+        setLoading(false)
+      }
+
     }
   };
 
@@ -159,7 +168,7 @@ export default function SignIn() {
                   color={nameError ? 'error' : 'primary'}
                 />
               </FormControl>
-              <FormControl>
+              {/* <FormControl>
                 <FormLabel htmlFor="email">Email</FormLabel>
                 <TextField
 
@@ -175,7 +184,7 @@ export default function SignIn() {
                   helperText={emailErrorMessage}
                   color={emailError ? 'error' : 'primary'}
                 />
-              </FormControl>
+              </FormControl> */}
               <FormControl>
                 <FormLabel htmlFor="password">Password</FormLabel>
                 <TextField
@@ -198,6 +207,7 @@ export default function SignIn() {
                 type="submit"
                 fullWidth
                 variant="contained"
+                disabled={loading}
               >
                 Sign up
               </Button>
