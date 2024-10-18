@@ -114,7 +114,7 @@ export default function SignIn() {
         }
       } catch (error) {
         console.log(error)
-        toast.error(error)
+        toast(error)
       }
       finally {
         setLoading(false)

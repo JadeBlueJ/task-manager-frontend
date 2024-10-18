@@ -8,10 +8,7 @@ import ErrorPage from './pages/ErrorPage';
 import 'react-toastify/dist/ReactToastify.css'; // Ensure this is imported
 import { ToastContainer } from 'react-toastify'; // Import ToastContainer
 const App = () => {
-  const isAuthenticated = () => {
-    // Simple auth check (e.g., check for token in localStorage)
-    return localStorage.getItem('authToken');
-  };
+
   return (
     <>
       <Router>
@@ -23,8 +20,8 @@ const App = () => {
 
           {/* Protected Routes */}
           
-          <Route path="/tasks" element={isAuthenticated() ? <Tasks /> : <Navigate to="/login" />} />
-          <Route path="/categories" element={isAuthenticated() ? <Categories /> : <Navigate to="/login" />} />
+          <Route path="/tasks" element={<Tasks />} />
+          <Route path="/categories" element={<Categories />} />
 
           {/* Catch-all Route for Unauthorized or Invalid Paths */}
           <Route path="*" element={<ErrorPage />} />

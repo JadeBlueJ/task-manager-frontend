@@ -8,6 +8,7 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import EditIcon from '@mui/icons-material/Edit'; // Import Edit icon
 import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import dayjs from 'dayjs'; // Import dayjs for date formatting
 
 export default function TaskItem({ task, remove, toggle, edit }) {
     const labelId = `checkbox-list-label-${task.taskId}`;
@@ -17,8 +18,11 @@ export default function TaskItem({ task, remove, toggle, edit }) {
     };
 
     const handleEdit = () => {
-        edit(task); // Call the edit function with the task id
+        edit(task); // Call the edit function with the task
     };
+
+    // Format the due date if it exists
+    const formattedDueDate = task.dueDate ? dayjs(task.dueDate).format('MMM D, YYYY') : '';
 
     return (
         <ListItem
@@ -53,7 +57,18 @@ export default function TaskItem({ task, remove, toggle, edit }) {
                         key={task.taskId}
                     />
                 </ListItemIcon>
-                <ListItemText id={labelId} primary={task.title} />
+                <ListItemText
+                    id={labelId}
+                    primary={task.title}
+                    secondary={
+                        <>
+                            <div>{task.description}</div>
+                            {task.dueDate && <div>Due: {formattedDueDate}</div>}
+                            <div>Status: {task.status}</div>
+                            {task.category && <div>Category: {task.category}</div>}
+                        </>
+                    }
+                />
             </ListItemButton>
         </ListItem>
     );

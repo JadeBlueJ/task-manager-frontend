@@ -32,8 +32,9 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('pending');
     const [category, setCategory] = useState(''); // Initialize with empty string
-    const [dueBy, setDueBy] = useState(dayjs()); // Initialize with current date
-    const [loading, setLoading] = useState(false)
+    const [dueBy, setDueBy] = useState(null); // Initialize with null
+    const [loading, setLoading] = useState(false);
+    
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -43,34 +44,33 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
             description,
             status,
             category,
-            dueDate: dueBy.format('YYYY-MM-DD'), // Format the date for the API
+            dueDate: dueBy ? dueBy.format('YYYY-MM-DD') : null, // Only format if dueBy is not null
         };
+
         try {
-            setLoading(true)
-            // Call your API here (replace the following with your actual API call)
+            setLoading(true);
             await axiosClient.post('/tasks', taskData);
-            toast('Added successfully')
-
+            toast('Added successfully');
         } catch (error) {
-            console.log(error)
-            toast('Something went wrong')
+            console.log(error);
+            toast('Something went wrong');
+        } finally {
+            setLoading(false);
+        }
 
-        }
-        finally {
-            setLoading(false)   
-        }
-        clearFields()
-        // After successful API call, add the task to the list
-        addTask(taskData);
+        clearFields();
+        addTask(taskData); // After successful API call, add the task to the list
         handleClose(); // Close the modal
     };
+
     const clearFields = () => {
-        setTitle('')
-        setDescription('')
-        setStatus('pending')
-        setCategory('')
-        setDueBy(dayjs())
-      }
+        setTitle('');
+        setDescription('');
+        setStatus('pending');
+        setCategory('');
+        setDueBy(null); // Reset to null
+    };
+
     // Get today's date as a Day.js object for comparison
     const today = dayjs();
 
@@ -111,13 +111,13 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
                     </FormControl>
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                         <DatePicker
-                            label="Due By"
+                            label="Due By (optional)"
                             value={dueBy}
                             onChange={(newValue) => {
-                                setDueBy(newValue);
+                                setDueBy(newValue); // Set due date or null
                             }}
                             minDate={today} // Restrict to today and future dates
-                            renderInput={(params) => <TextField {...params} fullWidth margin="normal" required />}
+                            renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
                         />
                     </LocalizationProvider>
                     <FormControl fullWidth margin="normal" disabled={categoryOptions.length === 0}>

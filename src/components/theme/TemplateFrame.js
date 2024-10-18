@@ -8,7 +8,8 @@ import Toolbar from '@mui/material/Toolbar';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import ToggleColorMode from './ToggleColorMode';
 import getTheme from './getTheme';
-
+import LogoutIcon from '@mui/icons-material/Logout';
+import { useNavigate } from 'react-router-dom';
 const StyledAppBar = styled(AppBar)(({ theme }) => ({
   position: 'relative',
   display: 'flex',
@@ -29,8 +30,12 @@ function TemplateFrame({
   toggleColorMode,
   children,
 }) {
+  const navigate=useNavigate()
   const signUpTheme = createTheme(getTheme(mode));
-
+  const handleLogout = ()=>{
+    localStorage.removeItem('authToken')
+    navigate('/login')
+  }
   return (
     <ThemeProvider theme={signUpTheme}>
       <Box sx={{ height: '100dvh', display: 'flex', flexDirection: 'column' }}>
@@ -55,7 +60,13 @@ function TemplateFrame({
               <ArrowBackRoundedIcon />
             </IconButton> */}
             <Box sx={{ display: 'flex', gap: 1 }}>
-
+              <IconButton
+                size="small"
+                aria-label="Logout"
+                onClick={handleLogout}
+              >
+                <LogoutIcon />
+              </IconButton>
               {/* <ToggleColorMode
                 data-screenshot="toggle-mode"
                 mode={mode}
