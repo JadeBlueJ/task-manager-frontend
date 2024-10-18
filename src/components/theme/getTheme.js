@@ -7,7 +7,7 @@ import {
   surfacesCustomizations,
 } from './customizations';
 
-export default function getSignUpTheme(mode) {
+export default function getTheme(mode) {
   return {
     ...getDesignTokens(mode),
     components: {

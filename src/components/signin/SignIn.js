@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
-import getSignUpTheme from './theme/getSignUpTheme';
+import getTheme from '../theme/getTheme';
 import TemplateFrame from './TemplateFrame';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -49,7 +49,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 
 export default function SignIn() {
   const [mode, setMode] = React.useState('light');
-  const SignUpTheme = createTheme(getSignUpTheme(mode));
+  const theme = createTheme(getTheme(mode));
 
   const [email, setEmail] = React.useState('');
   const [emailError, setEmailError] = React.useState(false);
@@ -113,7 +113,7 @@ export default function SignIn() {
 
   return (
     <TemplateFrame mode={mode} toggleColorMode={toggleColorMode}>
-      <ThemeProvider theme={SignUpTheme}>
+      <ThemeProvider theme={theme}>
         <CssBaseline enableColorScheme />
         <SignUpContainer direction="column" justifyContent="space-between">
           <Card variant="outlined">
