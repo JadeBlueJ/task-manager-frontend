@@ -1,10 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import Signup from './components/Signup';
-import Login from './components/Login';
-import Tasks from './components/Tasks';
-import Categories from './components/Categories';
-import ErrorPage from './components/ErrorPage';
+import Signup from './pages/Signup';
+import Login from './pages/Login';
+import Tasks from './pages/Tasks';
+import Categories from './pages/Categories';
+import ErrorPage from './pages/ErrorPage';
 
 const App = () => {
   const isAuthenticated = () => {

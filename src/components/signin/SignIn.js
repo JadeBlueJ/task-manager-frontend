@@ -51,10 +51,6 @@ export default function SignIn() {
   const [mode, setMode] = React.useState('light');
   const SignUpTheme = createTheme(getSignUpTheme(mode));
 
-  const [name, setName] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
-
   const [email, setEmail] = React.useState('');
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
@@ -102,15 +98,6 @@ export default function SignIn() {
       setPasswordErrorMessage('');
     }
 
-    if (!name || name.length < 1) {
-      setNameError(true);
-      setNameErrorMessage('Name is required.');
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage('');
-    }
-
     return isValid;
   };
 
@@ -118,7 +105,6 @@ export default function SignIn() {
     event.preventDefault();
     if (validateInputs()) {
       console.log({
-        name,
         email,
         password,
       });
@@ -136,29 +122,13 @@ export default function SignIn() {
               variant="h4"
               sx={{ width: '100%', fontSize: 'clamp(2rem, 10vw, 2.15rem)' }}
             >
-              Sign up
+              Sign In
             </Typography>
             <Box
               component="form"
               onSubmit={handleSubmit}
               sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
             >
-              <FormControl>
-                <FormLabel htmlFor="name">Full name</FormLabel>
-                <TextField
-                  autoComplete="name"
-                  name="name"
-
-                  fullWidth
-                  id="name"
-                  placeholder="Jon Snow"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  error={nameError}
-                  helperText={nameErrorMessage}
-                  color={nameError ? 'error' : 'primary'}
-                />
-              </FormControl>
               <FormControl>
                 <FormLabel htmlFor="email">Email</FormLabel>
                 <TextField
@@ -199,17 +169,17 @@ export default function SignIn() {
                 fullWidth
                 variant="contained"
               >
-                Sign up
+                Sign In
               </Button>
               <Typography sx={{ textAlign: 'center' }}>
-                Already have an account?{' '}
+                Don't have an account?{' '}
                 <span>
                   <Link
-                    href="/login"
+                    href="/signup"
                     variant="body2"
                     sx={{ alignSelf: 'center' }}
                   >
-                    Sign in
+                    Sign up
                   </Link>
                 </span>
               </Typography>
