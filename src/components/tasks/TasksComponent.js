@@ -18,7 +18,7 @@ import { useNavigate } from 'react-router-dom';
 import Masonry from 'react-masonry-css';
 import Container from '@mui/material/Container'; // Updated import
 import NoteCard from '../common/NoteCard'
-import TodoList from './TodoList';
+import TaskList from './TaskList';
 const Card = styled(MuiCard)(({ theme }) => ({
     display: 'flex',
     flexDirection: 'column',
@@ -57,17 +57,7 @@ export default function TasksComponent() {
     const navigate = useNavigate();
     const [mode, setMode] = React.useState('light');
     const theme = createTheme(getTheme(mode));
-    const [tasks, setTasks] = React.useState([]);
-    const getTasks = React.useCallback(async () => {
-        const response = await axiosClient.get('/tasks')
-        if (response.data.success) {
-            setTasks(response.data.tasks)
-        }
-    }, [])
 
-    React.useEffect(() => {
-        getTasks()
-    }, [getTasks]);
 
     const toggleColorMode = () => {
         const newMode = mode === 'dark' ? 'light' : 'dark';
@@ -80,7 +70,7 @@ export default function TasksComponent() {
             <ThemeProvider theme={theme}>
                 <CssBaseline enableColorScheme />
                 <SignUpContainer direction="column" justifyContent="space-between">
-                    <TodoList />
+                    <TaskList />
                 </SignUpContainer>
             </ThemeProvider>
         </TemplateFrame>
