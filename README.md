@@ -30,5 +30,5 @@ You can start the backend server by running:
 4. **Once, the server is running, you can hit the path:**
     ```
         http:/localhost:3000
-    
-    to open an instance on the browser.
+        
+**to open an instance on the browser.**
