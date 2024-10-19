@@ -196,7 +196,7 @@ export default function TaskList() {
                         textAlign: 'center'
                     }}
                 >
-                    Task Manager
+                    Task Manager X
                 </Typography>
 
                 {/* Filter dropdowns */}
