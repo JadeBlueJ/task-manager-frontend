@@ -128,8 +128,8 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
                             label="Category (optional)" // Ensure the label is associated correctly
                         >
                             {categoryOptions.map((option) => (
-                                <MenuItem key={option} value={option}>
-                                    {option}
+                                <MenuItem key={option.categoryId} value={option._id}>
+                                    {option.categoryName}
                                 </MenuItem>
                             ))}
                         </Select>

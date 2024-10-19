@@ -1,7 +1,8 @@
 import React from 'react';
+import CategoryComponent from '../components/categories/CategoryComponent';
 
 const Categories = () => {
-  return <div>Categories Page</div>;
+  return <div><CategoryComponent /></div>;
 };
 
 export default Categories;

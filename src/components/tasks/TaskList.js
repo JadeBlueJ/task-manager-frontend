@@ -1,12 +1,13 @@
 import List from '@mui/material/List';
 import React, { useState, useEffect } from 'react';
 import TaskItem from './TaskItem';
-import { Box, Typography, createTheme, ThemeProvider, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Box, Typography, createTheme, ThemeProvider, Button, Select, MenuItem, FormControl, InputLabel, CircularProgress, ListItem } from '@mui/material';
 import TaskFormModal from './TaskFormModal';
 import { axiosClient } from '../../utils/api.utils';
 import EditTaskModal from './EditTaskModal';
 import { toast } from 'react-toastify';
 import ConfirmationModal from './ConfirmationModal';
+import { useNavigate } from 'react-router-dom';
 
 const theme = createTheme({
     typography: {
@@ -42,7 +43,10 @@ export default function TaskList() {
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [currentTask, setCurrentTask] = useState(null);
     const [taskToDelete, setTaskToDelete] = useState(null);
+    const [loading, setLoading] = useState(false);
 
+
+    const navigate = useNavigate()
     const handleEditOpen = (task) => {
         setCurrentTask(task);
         setEditModalOpen(true);
@@ -77,15 +81,21 @@ export default function TaskList() {
         setTaskToDelete(null);
     };
 
-    // Fetch tasks from API
     const getTasks = React.useCallback(async () => {
-        const response = await axiosClient.get('/tasks');
-        if (response.data.success) {
-            setTasks(response.data.tasks);
-            setCategories(response.data.categories || []);  // Assuming categories are returned from the API
+        setLoading(true); // Start loading when fetching categories
+        try {
+            const response = await axiosClient.get('/tasks');
+            if (response.data.success) {
+                setTasks(response.data.tasks);
+                setCategories(response.data.categories || []);
+            }
+        } catch (error) {
+            console.error(error);
+            toast('Error fetching categories');
+        } finally {
+            setLoading(false); // End loading when fetching is complete
         }
     }, []);
-
     useEffect(() => {
         getTasks();
     }, [getTasks]);
@@ -132,7 +142,7 @@ export default function TaskList() {
 
     // Dropdown for filtering by status
     const statusDropdown = (
-        <FormControl sx={{ minWidth: 120, marginRight: 2 }}>
+        <FormControl sx={{ minWidth: 250, marginRight: 2 }}>
             <InputLabel>Status</InputLabel>
             <Select
                 value={filterStatus}
@@ -149,7 +159,7 @@ export default function TaskList() {
 
     // Dropdown for filtering by category (if any categories exist)
     const categoryDropdown = categories.length > 0 && (
-        <FormControl sx={{ minWidth: 120 }}>
+        <FormControl sx={{ minWidth: 250 }}>
             <InputLabel>Category</InputLabel>
             <Select
                 value={filterCategory}
@@ -158,8 +168,8 @@ export default function TaskList() {
             >
                 <MenuItem value="All">All</MenuItem>
                 {categories.map((category) => (
-                    <MenuItem key={category} value={category}>
-                        {category}
+                    <MenuItem key={category.categoryId} value={category.categoryId}>
+                        {category.categoryName}
                     </MenuItem>
                 ))}
             </Select>
@@ -193,7 +203,7 @@ export default function TaskList() {
                 <Box
                     sx={{
                         display: 'flex',
-                        justifyContent: 'space-between',
+                        justifyContent: 'center',
                         alignItems: 'center',
                         mt: 2,
                         mb: 2,
@@ -202,6 +212,29 @@ export default function TaskList() {
                 >
                     {statusDropdown}
                     {categoryDropdown}
+
+                </Box>
+                <Box sx={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    alignItems: 'center',
+                    mt: 2,
+                    mb: 2,
+                    width: '100%',
+                }}>
+                    <Button
+                        variant="contained"
+                        onClick={() => { navigate('/categories') }}
+                        sx={{
+                            marginRight: '10px',
+                            backgroundColor: '#eb5e28',
+                            '&:hover': {
+                                backgroundColor: '#d54c19',
+                            },
+                        }}
+                    >
+                        Categories
+                    </Button>
                     <Button
                         variant="contained"
                         onClick={() => setOpenModal(true)}
@@ -214,8 +247,8 @@ export default function TaskList() {
                     >
                         Add Task
                     </Button>
-                </Box>
 
+                </Box>
                 <List
                     sx={{
                         width: '100%',
@@ -225,7 +258,19 @@ export default function TaskList() {
                         margin: 0,
                     }}
                 >
-                    {taskList.length > 0 ? taskList : <Typography>No tasks found</Typography>}
+                    {loading ? (
+                        // Show the loader while categories are being fetched
+                        <ListItem>
+                            <CircularProgress size={24} sx={{ marginRight: '16px' }} />
+                            <Typography>Loading categories...</Typography>
+                        </ListItem>
+                    ) : (
+                        taskList.length > 0 ? (
+                            taskList
+                        ) : (
+                            <Typography>No categories found</Typography>
+                        )
+                    )}
                 </List>
 
                 <Typography
@@ -237,7 +282,7 @@ export default function TaskList() {
                         justifyContent: 'space-between'
                     }}
                 >
-                    {filteredTasks.length} task{filteredTasks.length !== 1 && 's'} left
+                    {filteredTasks.length} task{filteredTasks.length !== 1 && 's'}
                 </Typography>
             </Box>
 

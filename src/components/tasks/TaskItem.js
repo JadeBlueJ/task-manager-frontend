@@ -65,7 +65,7 @@ export default function TaskItem({ task, remove, edit }) {
                             <div>{task.description}</div>
                             {task.dueDate && <div>Due: {formattedDueDate}</div>}
                             <div>Status: {task.status}</div>
-                            {task.category && <div>Category: {task.category}</div>}
+                            {task.category && task.category?.categoryId && <div>Category: {task.category?.categoryName}</div>}
                         </>
                     }
                 />
