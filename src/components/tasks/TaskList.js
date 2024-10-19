@@ -44,7 +44,9 @@ export default function TaskList() {
     const [currentTask, setCurrentTask] = useState(null);
     const [taskToDelete, setTaskToDelete] = useState(null);
     const [loading, setLoading] = useState(false);
-
+    const [currentPage, setCurrentPage] = useState(1);
+    const [tasksPerPage] = useState(5); // Number of tasks to display per page
+    const [totalTasks, setTotalTasks] = useState(0); // Total number of tasks
 
     const navigate = useNavigate()
     const handleEditOpen = (task) => {
@@ -84,10 +86,18 @@ export default function TaskList() {
     const getTasks = React.useCallback(async () => {
         setLoading(true); // Start loading when fetching categories
         try {
-            const response = await axiosClient.get('/tasks');
+            const response = await axiosClient.get('/tasks', {
+                params: {
+                    skip: (currentPage - 1) * tasksPerPage,
+                    limit: tasksPerPage,
+                    status: filterStatus,
+                    category: filterCategory,
+                },
+            });
             if (response.data.success) {
                 setTasks(response.data.tasks);
                 setCategories(response.data.categories || []);
+                setTotalTasks(response.data.totalTasks)
             }
         } catch (error) {
             console.error(error);
@@ -95,10 +105,11 @@ export default function TaskList() {
         } finally {
             setLoading(false); // End loading when fetching is complete
         }
-    }, []);
+    }, [currentPage, filterCategory, filterStatus, tasksPerPage]);
+
     useEffect(() => {
         getTasks();
-    }, [getTasks]);
+    }, [currentPage, getTasks]);
 
     // Filter tasks based on status and category
     const filteredTasks = tasks.filter((task) => {
@@ -124,7 +135,7 @@ export default function TaskList() {
 
         // Filter based on category
         if (filterCategory !== 'All') {
-            categoryMatch = task.category === filterCategory;
+            categoryMatch = task.category?._id === filterCategory;
         }
 
         return statusMatch && categoryMatch;
@@ -139,7 +150,17 @@ export default function TaskList() {
             edit={handleEditOpen}
         />
     ));
+    const handleNextPage = () => {
+        if (currentPage < Math.ceil(totalTasks / tasksPerPage)) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
 
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
     // Dropdown for filtering by status
     const statusDropdown = (
         <FormControl sx={{ minWidth: 250, marginRight: 2 }}>
@@ -168,7 +189,7 @@ export default function TaskList() {
             >
                 <MenuItem value="All">All</MenuItem>
                 {categories.map((category) => (
-                    <MenuItem key={category.categoryId} value={category.categoryId}>
+                    <MenuItem key={category.categoryId} value={category._id}>
                         {category.categoryName}
                     </MenuItem>
                 ))}
@@ -273,17 +294,17 @@ export default function TaskList() {
                     )}
                 </List>
 
-                <Typography
-                    variant='h5'
-                    component='h5'
-                    sx={{
-                        display: 'flex',
-                        marginTop: '10px',
-                        justifyContent: 'space-between'
-                    }}
-                >
-                    {filteredTasks.length} task{filteredTasks.length !== 1 && 's'}
-                </Typography>
+                {!loading &&
+                    <Typography variant='h5' component='h5' sx={{ display: 'flex', marginTop: '10px', justifyContent: 'space-between' }}>
+                        {totalTasks} task{totalTasks !== 1 && 's'}
+                    </Typography>}
+
+                {/* Pagination Buttons */}
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 2 }}>
+                    <Button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</Button>
+                    <Button onClick={handleNextPage} disabled={currentPage >= Math.ceil(totalTasks / tasksPerPage)}>Next</Button>
+                </Box>
+
             </Box>
 
             {/* Modal for adding Task */}
