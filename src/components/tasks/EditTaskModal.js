@@ -40,9 +40,9 @@ export default function EditTaskModal({ open, handleClose, task, editTask, categ
             setTitle(task.title);
             setDescription(task.description);
             setStatus(task.status);
-            if (task.category?._id) setCategory(task.category?._id); // Handle optional category
+            if (task.category?._id) setCategory(task.category?._id);
             else setCategory('')
-            if (task.dueDate) setDueBy(dayjs(task.dueDate)); // Initialize with task due date
+            if (task.dueDate) { setDueBy(dayjs(task.dueDate)) } else setDueBy(null)
         }
     }, [task]);
 

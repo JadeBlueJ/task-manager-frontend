@@ -1,13 +1,16 @@
 import List from '@mui/material/List';
 import React, { useState, useEffect } from 'react';
 import TaskItem from './TaskItem';
-import { Box, Typography, createTheme, ThemeProvider, Button, Select, MenuItem, FormControl, InputLabel, CircularProgress, ListItem } from '@mui/material';
+import { Box, Typography, createTheme, ThemeProvider, Button, Select, MenuItem, FormControl, InputLabel, CircularProgress, ListItem, IconButton } from '@mui/material';
 import TaskFormModal from './TaskFormModal';
 import { axiosClient } from '../../utils/api.utils';
 import EditTaskModal from './EditTaskModal';
 import { toast } from 'react-toastify';
 import ConfirmationModal from './ConfirmationModal';
 import { useNavigate } from 'react-router-dom';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
+import TaskCalendar from '../calendar/TaskCalendarModal';
+import TaskCalendarModal from '../calendar/TaskCalendarModal';
 
 const theme = createTheme({
     typography: {
@@ -35,6 +38,8 @@ const styles = {
 
 export default function TaskList() {
     const [tasks, setTasks] = useState([]);
+    const [allTasks, setAllTasks] = useState([]);
+
     const [filterStatus, setFilterStatus] = useState('All');  // Status filter state
     const [filterCategory, setFilterCategory] = useState('All');  // Category filter state
     const [categories, setCategories] = useState([]);  // List of categories
@@ -47,6 +52,7 @@ export default function TaskList() {
     const [currentPage, setCurrentPage] = useState(1);
     const [tasksPerPage] = useState(5); // Number of tasks to display per page
     const [totalTasks, setTotalTasks] = useState(0); // Total number of tasks
+    const [showCalendar, setShowCalendar] = useState(false); // Total number of tasks
 
     const navigate = useNavigate()
     const handleEditOpen = (task) => {
@@ -82,7 +88,13 @@ export default function TaskList() {
         setOpenConfirmModal(false);
         setTaskToDelete(null);
     };
+    const handleOpenCalendar = () => {
+        setShowCalendar(true);
+    };
 
+    const handleCloseCalendar = () => {
+        setShowCalendar(false);
+    };
     const getTasks = React.useCallback(async () => {
         setLoading(true); // Start loading when fetching categories
         try {
@@ -101,16 +113,34 @@ export default function TaskList() {
             }
         } catch (error) {
             console.error(error);
-            toast('Error fetching categories');
+            toast('Error fetching tasks');
         } finally {
             setLoading(false); // End loading when fetching is complete
         }
     }, [currentPage, filterCategory, filterStatus, tasksPerPage]);
 
+    const getAllTasks = React.useCallback(async () => {
+        // setLoading(true); // Start loading when fetching categories
+        try {
+            const response = await axiosClient.get('/tasks/all');
+            if (response.data.success) {
+                setAllTasks(response.data.tasks)
+            }
+        } catch (error) {
+            console.error(error);
+            toast('Error fetching all tasks');
+        } finally {
+            // setLoading(false); // End loading when fetching is complete
+        }
+    }, []);
+
     useEffect(() => {
         getTasks();
     }, [currentPage, getTasks]);
 
+    useEffect(() => {
+        getAllTasks();
+    },[getAllTasks, tasks])
     // Filter tasks based on status and category
     const filteredTasks = tasks.filter((task) => {
         let statusMatch = true;
@@ -245,6 +275,22 @@ export default function TaskList() {
                 }}>
                     <Button
                         variant="contained"
+                        onClick={handleOpenCalendar}
+                        sx={{
+                            marginRight: '10px',
+                            backgroundColor: 'orange',
+                            color: 'white',
+                            '&:hover': {
+                                backgroundColor: '#d54c19',
+                            },
+                        }}
+                        startIcon={<CalendarTodayIcon sx={{ color: 'white' }} />}  // Add icon here
+                    >
+                        Calendar
+                    </Button>
+
+                    <Button
+                        variant="contained"
                         onClick={() => { navigate('/categories') }}
                         sx={{
                             marginRight: '10px',
@@ -326,6 +372,7 @@ export default function TaskList() {
                 handleClose={handleCloseModal}
                 handleConfirm={handleConfirmDelete}
             />
+            <TaskCalendarModal tasks={allTasks} open={showCalendar} onClose={handleCloseCalendar} />
         </ThemeProvider>
     );
 }

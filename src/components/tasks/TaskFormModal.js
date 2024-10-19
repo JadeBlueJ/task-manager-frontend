@@ -114,9 +114,9 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
                             label="Due By (optional)"
                             value={dueBy}
                             onChange={(newValue) => {
-                                setDueBy(newValue); // Set due date or null
+                                setDueBy(newValue);
                             }}
-                            minDate={today} // Restrict to today and future dates
+                            minDate={today} 
                             renderInput={(params) => <TextField {...params} fullWidth margin="normal" />}
                         />
                     </LocalizationProvider>
@@ -125,7 +125,7 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
                         <Select
                             value={category}
                             onChange={(e) => setCategory(e.target.value)}
-                            label="Category (optional)" // Ensure the label is associated correctly
+                            label="Category (optional)"
                         >
                             {categoryOptions.map((option) => (
                                 <MenuItem key={option.categoryId} value={option._id}>

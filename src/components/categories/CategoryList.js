@@ -78,7 +78,7 @@ export default function CategoryList() {
             console.error(error);
             toast('Error fetching categories');
         } finally {
-            setLoading(false); // End loading when fetching is complete
+            setLoading(false);
         }
     }, []);
 
@@ -89,8 +89,8 @@ export default function CategoryList() {
 
     const categoryList = categories.map((category) => (
         <CategoryItem
-            category={category} // Updated from task
-            key={category.categoryId} // Assuming there's a categoryId
+            category={category}
+            key={category.categoryId}
             remove={handleOpenModal}
         />
     ));
@@ -98,7 +98,7 @@ export default function CategoryList() {
     return (
         <ThemeProvider theme={theme}>
             <Box
-                className='CategoryList' // Updated from TaskList
+                className='CategoryList'
                 sx={{
                     ...styles,
                     width: '100%',
