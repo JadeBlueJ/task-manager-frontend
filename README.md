@@ -1,4 +1,4 @@
-# Backend Project README
+# Task Manager X Project README
 
 ## Overview
 
@@ -11,8 +11,8 @@ Follow the steps below to get your environment set up:
 1. **Clone the repository:**
 
    ```
-        git clone https://github.com/JadeBlueJ/task-manager.git
-        cd task-manager
+        git clone https://github.com/JadeBlueJ/task-manager-frontend.git
+        cd task-manager-frontend
 
 2. **Install dependencies:**
 Run the following command to install all necessary packages:
@@ -27,7 +27,8 @@ You can start the backend server by running:
     ```
     npm start
 
-Once, the server is running, you can hit the path:
+4. **Once, the server is running, you can hit the path:**
     ```
         http:/localhost:3000
-to open an instance on the browser.
+    
+    to open an instance on the browser.
