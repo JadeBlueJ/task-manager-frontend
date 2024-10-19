@@ -32,7 +32,7 @@ export default function EditTaskModal({ open, handleClose, task, editTask, categ
     const [description, setDescription] = useState('');
     const [status, setStatus] = useState('pending');
     const [category, setCategory] = useState('');
-    const [dueBy, setDueBy] = useState(dayjs());
+    const [dueBy, setDueBy] = useState(null);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
@@ -41,7 +41,7 @@ export default function EditTaskModal({ open, handleClose, task, editTask, categ
             setDescription(task.description);
             setStatus(task.status);
             setCategory(task.category || ''); // Handle optional category
-            setDueBy(dayjs(task.dueDate)); // Initialize with task due date
+            if (task.dueDate) setDueBy(dayjs(task.dueDate)); // Initialize with task due date
         }
     }, [task]);
 
@@ -52,9 +52,10 @@ export default function EditTaskModal({ open, handleClose, task, editTask, categ
             title,
             description,
             status,
-            dueDate: dueBy.format('YYYY-MM-DD'), // Format the date for the API
+            // dueDate: dueBy.format('YYYY-MM-DD'), // Format the date for the API
         };
         if (category) updatePayload.category = category
+        if (dueBy) updatePayload.dueDate = dueBy.format('YYYY-MM-DD')
 
         try {
             setLoading(true);

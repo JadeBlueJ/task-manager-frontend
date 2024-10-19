@@ -10,7 +10,7 @@ import RadioButtonUncheckedIcon from '@mui/icons-material/RadioButtonUnchecked';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import dayjs from 'dayjs'; // Import dayjs for date formatting
 
-export default function TaskItem({ task, remove, toggle, edit }) {
+export default function TaskItem({ task, remove, edit }) {
     const labelId = `checkbox-list-label-${task.taskId}`;
 
     const removeTask = () => {
@@ -43,7 +43,7 @@ export default function TaskItem({ task, remove, toggle, edit }) {
                 role={undefined}
                 dense
             >
-                <ListItemIcon>
+                {/* <ListItemIcon>
                     <Checkbox
                         edge="start"
                         checked={task.status === 'completed'}
@@ -56,7 +56,7 @@ export default function TaskItem({ task, remove, toggle, edit }) {
                         color='warning'
                         key={task.taskId}
                     />
-                </ListItemIcon>
+                </ListItemIcon> */}
                 <ListItemText
                     id={labelId}
                     primary={task.title}

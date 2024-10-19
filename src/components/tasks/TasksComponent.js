@@ -12,7 +12,6 @@ import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import TemplateFrame from '../theme/TemplateFrame';
 import getTheme from '../theme/getTheme';
-import { axiosClient } from '../../utils/api.utils'
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
 import Masonry from 'react-masonry-css';

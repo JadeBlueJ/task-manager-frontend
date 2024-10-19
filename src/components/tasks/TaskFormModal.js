@@ -34,7 +34,7 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
     const [category, setCategory] = useState(''); // Initialize with empty string
     const [dueBy, setDueBy] = useState(null); // Initialize with null
     const [loading, setLoading] = useState(false);
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -44,9 +44,9 @@ export default function TaskFormModal({ open, handleClose, addTask, categoryOpti
             description,
             status,
             category,
-            dueDate: dueBy ? dueBy.format('YYYY-MM-DD') : null, // Only format if dueBy is not null
+            // dueDate: dueBy ? dueBy.format('YYYY-MM-DD') : null, // Only format if dueBy is not null
         };
-
+        if (dueBy) taskData.dueDate = dueBy.format('YYYY-MM-DD')
         try {
             setLoading(true);
             await axiosClient.post('/tasks', taskData);

@@ -1,8 +1,7 @@
 import List from '@mui/material/List';
 import React, { useState, useEffect } from 'react';
 import TaskItem from './TaskItem';
-import { Box, Typography, createTheme, ThemeProvider, Button } from '@mui/material';
-import FilterBtn from './FilterBtn';
+import { Box, Typography, createTheme, ThemeProvider, Button, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
 import TaskFormModal from './TaskFormModal';
 import { axiosClient } from '../../utils/api.utils';
 import EditTaskModal from './EditTaskModal';
@@ -11,10 +10,7 @@ import ConfirmationModal from './ConfirmationModal';
 
 const theme = createTheme({
     typography: {
-        fontFamily: [
-            'Montserrat',
-            'sans-serif',
-        ].join(','),
+        fontFamily: ['Montserrat', 'sans-serif'].join(','),
     },
 });
 
@@ -33,23 +29,16 @@ const styles = {
     border: '2px solid #252422',
     maxWidth: '38rem',
     marginLeft: 'auto',
-    marginRight: 'auto'
+    marginRight: 'auto',
 };
-
-const FILTER_MAP = {
-    All: () => true,
-    Active: (task) => !task.completed,
-    Completed: (task) => task.completed
-};
-
-const FILTER_NAMES = Object.keys(FILTER_MAP);
 
 export default function TaskList() {
     const [tasks, setTasks] = useState([]);
-    const [filter, setFilter] = useState('All');
+    const [filterStatus, setFilterStatus] = useState('All');  // Status filter state
+    const [filterCategory, setFilterCategory] = useState('All');  // Category filter state
+    const [categories, setCategories] = useState([]);  // List of categories
     const [openModal, setOpenModal] = useState(false);
     const [openConfirmModal, setOpenConfirmModal] = useState(false);
-
     const [isEditModalOpen, setEditModalOpen] = useState(false);
     const [currentTask, setCurrentTask] = useState(null);
     const [taskToDelete, setTaskToDelete] = useState(null);
@@ -63,10 +52,12 @@ export default function TaskList() {
         setEditModalOpen(false);
         setCurrentTask(null);
     };
+
     const handleOpenModal = (id) => {
         setTaskToDelete(id);
         setOpenConfirmModal(true);
     };
+
     const handleConfirmDelete = async () => {
         if (taskToDelete) {
             try {
@@ -80,63 +71,100 @@ export default function TaskList() {
             handleCloseModal();
         }
     };
+
     const handleCloseModal = () => {
         setOpenConfirmModal(false);
         setTaskToDelete(null);
     };
-    const getTasks = React.useCallback(async () => {
-        const response = await axiosClient.get('/tasks')
-        if (response.data.success) {
-            setTasks(response.data.tasks)
-        }
-    }, [])
 
-    React.useEffect(() => {
-        getTasks()
+    // Fetch tasks from API
+    const getTasks = React.useCallback(async () => {
+        const response = await axiosClient.get('/tasks');
+        if (response.data.success) {
+            setTasks(response.data.tasks);
+            setCategories(response.data.categories || []);  // Assuming categories are returned from the API
+        }
+    }, []);
+
+    useEffect(() => {
+        getTasks();
     }, [getTasks]);
 
-    const filterList = FILTER_NAMES.map((name) => (
-        <FilterBtn
-            key={name}
-            name={name}
-            isPressed={name === filter}
-            setFilter={setFilter}
+    // Filter tasks based on status and category
+    const filteredTasks = tasks.filter((task) => {
+        let statusMatch = true;
+        let categoryMatch = true;
+
+        // Filter based on status (pending, in-progress, completed)
+        if (filterStatus !== 'All') {
+            switch (filterStatus) {
+                case 'pending':
+                    statusMatch = task.status === 'pending';
+                    break;
+                case 'in-progress':
+                    statusMatch = task.status === 'in-progress';
+                    break;
+                case 'completed':
+                    statusMatch = task.status === 'completed';
+                    break;
+                default:
+                    statusMatch = true;
+            }
+        }
+
+        // Filter based on category
+        if (filterCategory !== 'All') {
+            categoryMatch = task.category === filterCategory;
+        }
+
+        return statusMatch && categoryMatch;
+    });
+
+
+    const taskList = filteredTasks.map((task) => (
+        <TaskItem
+            task={task}
+            key={task.taskId}
+            remove={handleOpenModal}
+            edit={handleEditOpen}
         />
     ));
 
-    const removeTask = async (id) => {
-        try {
-            await axiosClient.delete(`/tasks/${id}`)
-            toast('Deleted successfully')
-            getTasks()
-        } catch (error) {
-            console.log(error)
-            toast(error)
+    // Dropdown for filtering by status
+    const statusDropdown = (
+        <FormControl sx={{ minWidth: 120, marginRight: 2 }}>
+            <InputLabel>Status</InputLabel>
+            <Select
+                value={filterStatus}
+                onChange={(e) => setFilterStatus(e.target.value)}
+                label="Status"
+            >
+                <MenuItem value="All">All</MenuItem>
+                <MenuItem value="pending">Pending</MenuItem>
+                <MenuItem value="in-progress">In-Progress</MenuItem>
+                <MenuItem value="completed">Completed</MenuItem>
+            </Select>
+        </FormControl>
+    );
 
-        }
-    };
-
-    const toggleTask = (id) => {
-        setTasks((prevTasks) => prevTasks.map((task) => {
-            if (task.id === id) {
-                return { ...task, completed: !task.completed };
-            }
-            return task;
-        }));
-    };
-
-
-    const taskList = tasks
-        .filter(FILTER_MAP[filter])
-        .map((task) => (
-            <TaskItem
-                task={task}
-                key={task.taskId}
-                remove={handleOpenModal}
-                toggle={() => toggleTask(task.id)}
-                edit={handleEditOpen}
-            />
-        ));
+    // Dropdown for filtering by category (if any categories exist)
+    const categoryDropdown = categories.length > 0 && (
+        <FormControl sx={{ minWidth: 120 }}>
+            <InputLabel>Category</InputLabel>
+            <Select
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value)}
+                label="Category"
+            >
+                <MenuItem value="All">All</MenuItem>
+                {categories.map((category) => (
+                    <MenuItem key={category} value={category}>
+                        {category}
+                    </MenuItem>
+                ))}
+            </Select>
+        </FormControl>
+    );
 
     return (
         <ThemeProvider theme={theme}>
@@ -148,6 +176,46 @@ export default function TaskList() {
                     padding: { xs: 2, sm: 3 },
                 }}
             >
+                <Typography
+                    variant='h5'
+                    component='h4'
+                    sx={{
+                        color: '#eb5e28',
+                        paddingBottom: '10px',
+                        fontWeight: '500',
+                        textAlign: 'center'
+                    }}
+                >
+                    Task Manager
+                </Typography>
+
+                {/* Filter dropdowns */}
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        mt: 2,
+                        mb: 2,
+                        width: '100%',
+                    }}
+                >
+                    {statusDropdown}
+                    {categoryDropdown}
+                    <Button
+                        variant="contained"
+                        onClick={() => setOpenModal(true)}
+                        sx={{
+                            backgroundColor: '#eb5e28',
+                            '&:hover': {
+                                backgroundColor: '#d54c19',
+                            },
+                        }}
+                    >
+                        Add Task
+                    </Button>
+                </Box>
+
                 <List
                     sx={{
                         width: '100%',
@@ -157,57 +225,20 @@ export default function TaskList() {
                         margin: 0,
                     }}
                 >
-                    <Typography
-                        variant='h5'
-                        component='h4'
-                        sx={{
-                            color: '#eb5e28',
-                            paddingBottom: '10px',
-                            fontWeight: '500',
-                            textAlign: 'center'
-                        }}
-                    >
-                        Task Manager
-                    </Typography>
-                    <Box
-                        sx={{
-                            display: 'flex', // Make this a flex container
-                            flexDirection: 'row', // Column direction to stack elements
-                            flex: '1', // Take up remaining space
-                            justifyContent: 'flex-end', // Align items at the end
-                            mt: 2, // Add some top margin for spacing
-                            mb: 2
-                        }}
-                    >
-                        <Button
-                            variant="contained"
-                            onClick={() => setOpenModal(true)}
-                            sx={{
-                                backgroundColor: '#eb5e28', // Set custom orange color
-                                '&:hover': {
-                                    backgroundColor: '#d54c19', // Darker shade on hover
-                                },
-                            }}
-                        >
-                            Add Task
-                        </Button>
-                    </Box>
-                    {taskList}
-                    <Typography
-                        variant='h5'
-                        component='h5'
-                        sx={{
-                            display: 'flex',
-                            marginTop: '10px',
-                            justifyContent: 'space-between'
-                        }}
-                    >
-                        {taskList.length} task{taskList.length !== 1 && 's'} left
-                        <span>
-                            {filterList}
-                        </span>
-                    </Typography>
+                    {taskList.length > 0 ? taskList : <Typography>No tasks found</Typography>}
                 </List>
+
+                <Typography
+                    variant='h5'
+                    component='h5'
+                    sx={{
+                        display: 'flex',
+                        marginTop: '10px',
+                        justifyContent: 'space-between'
+                    }}
+                >
+                    {filteredTasks.length} task{filteredTasks.length !== 1 && 's'} left
+                </Typography>
             </Box>
 
             {/* Modal for adding Task */}
@@ -215,14 +246,14 @@ export default function TaskList() {
                 open={openModal}
                 handleClose={() => setOpenModal(false)}
                 addTask={getTasks}
-                categoryOptions={[]}
+                categoryOptions={categories}
             />
             <EditTaskModal
                 open={isEditModalOpen}
                 handleClose={handleEditClose}
                 task={currentTask}
-                editTask={getTasks} // Pass the editTask function to the modal
-                categoryOptions={[]}
+                editTask={getTasks}
+                categoryOptions={categories}
             />
             <ConfirmationModal
                 open={openConfirmModal}

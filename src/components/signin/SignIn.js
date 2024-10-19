@@ -14,6 +14,7 @@ import getTheme from '../theme/getTheme';
 import TemplateFrame from '../theme/TemplateFrame';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { axiosClient } from '../../utils/api.utils';
 
 const Card = styled(MuiCard)(({ theme }) => ({
@@ -102,12 +103,18 @@ export default function SignIn() {
     if (validateInputs()) {
       try {
         setLoading(true)
-        const response = await axiosClient.post('auth/login', { username: name, password })
+        const response = await axios.post('http://localhost:8800/v1/api/auth/login', { username: name, password })
         if (response.data.success) {
           toast('Logged in successfully!')
-          localStorage.setItem('authToken', response.data.token)
+          // Store the token in localStorage
+          const token = response.data.token;
+          localStorage.setItem('authToken', token);
+          // Update the axiosClient Authorization header with the new token
+          axiosClient.defaults.headers['Authorization'] = `Bearer ${token}`;
+
           clearFields()
           navigate('/tasks');  // Navigate to /tasks after 2 seconds
+          // window.location.reload()
           // setTimeout(() => {
           // }, 2000)
         }

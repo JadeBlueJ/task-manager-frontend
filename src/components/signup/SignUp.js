@@ -12,9 +12,9 @@ import MuiCard from '@mui/material/Card';
 import { createTheme, ThemeProvider, styled } from '@mui/material/styles';
 import TemplateFrame from '../theme/TemplateFrame';
 import getTheme from '../theme/getTheme';
-import { axiosClient } from '../../utils/api.utils'
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: 'flex',
@@ -104,13 +104,14 @@ export default function SignIn() {
     if (validateInputs()) {
       try {
         setLoading(true)
-        const response = await axiosClient.post('auth/signup', { username: name, password })
+        const response = await axios.post('http://localhost:8800/v1/api/auth/signup', { username: name, password })
         if (response.data.success) {
           toast('Signup successful, please login')
           clearFields()
-          setTimeout(() => {
-            navigate('/login');  // Navigate to /login after 2 seconds
-          }, 2000)
+          navigate('/login');  // Navigate to /login after 2 seconds
+          // window.location.reload()
+          // setTimeout(() => {
+          // }, 2000)
         }
       } catch (error) {
         console.log(error)
