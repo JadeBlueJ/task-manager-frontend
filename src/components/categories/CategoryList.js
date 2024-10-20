@@ -165,17 +165,18 @@ export default function CategoryList() {
                     )}
                 </List>
 
-                <Typography
-                    variant='h5'
-                    component='h5'
-                    sx={{
-                        display: 'flex',
-                        marginTop: '10px',
-                        justifyContent: 'space-between'
-                    }}
-                >
-                    {categories.length} categor{categories.length !== 1 ? 'ies' : 'y'}
-                </Typography>
+                {!loading &&
+                    <Typography
+                        variant='h5'
+                        component='h5'
+                        sx={{
+                            display: 'flex',
+                            marginTop: '10px',
+                            justifyContent: 'space-between'
+                        }}
+                    >
+                        {categories.length} categor{categories.length !== 1 ? 'ies' : 'y'}
+                    </Typography>}
             </Box>
 
             {/* Modal for adding Category */}

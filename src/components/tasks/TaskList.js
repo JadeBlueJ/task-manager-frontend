@@ -326,16 +326,16 @@ export default function TaskList() {
                     }}
                 >
                     {loading ? (
-                        // Show the loader while categories are being fetched
+                        // Show the loader while tasks are being fetched
                         <ListItem>
                             <CircularProgress size={24} sx={{ marginRight: '16px' }} />
-                            <Typography>Loading categories...</Typography>
+                            <Typography>Loading tasks...</Typography>
                         </ListItem>
                     ) : (
                         taskList.length > 0 ? (
                             taskList
                         ) : (
-                            <Typography>No categories found</Typography>
+                            <Typography>No tasks found</Typography>
                         )
                     )}
                 </List>
